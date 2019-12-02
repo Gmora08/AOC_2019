@@ -25,6 +25,24 @@ defmodule Aoc2019.Day2 do
     |> process_intcode(0)
   end
 
+  def part2(intcode) do
+    desired_input =
+      for(noun <- 0..99, verb <- 0..99, do: %{noun: noun, verb: verb})    
+      |> Enum.find(&find_desired_input(&1, intcode) == 19_690_720)
+
+    100 * desired_input.noun + desired_input.verb
+  end
+
+  defp find_desired_input(desired_input, intcode) do
+    executed_incode =
+      intcode
+      |> List.update_at(1, fn _ -> desired_input.noun end)
+      |> List.update_at(2, fn _ -> desired_input.verb end)
+      |> process_intcode(0)
+    
+    List.first(executed_incode)
+  end
+
   @spec process_intcode(list(integer), integer) :: list(integer)
   defp process_intcode(intcode, opcode_index) do
     {opcode_value, _} = List.pop_at(intcode, opcode_index)
